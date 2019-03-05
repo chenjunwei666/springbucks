@@ -13,10 +13,13 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 @SpringBootApplication
 @EnableJpaRepositories
@@ -29,13 +32,13 @@ public class SpringbucksApplication implements ApplicationRunner {
     private CoffeeOrderRepository orderRepository;
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringbucksApplication.class, args);
-
+       SpringApplication.run(SpringbucksApplication.class, args);
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         initOrders();
+        findOrders();
     }
 
 
@@ -69,5 +72,15 @@ public class SpringbucksApplication implements ApplicationRunner {
 
         orderRepository.save(order);
         log.info("Order:{}",order);
+    }
+
+    private void findOrders(){
+        coffeeRepository.findAll(Sort.by(Sort.Direction.DESC, "id"))
+                .forEach(coffee -> log.info("Loading {}",coffee));
+
+
+
+        //orderRepository.
+
     }
 }
