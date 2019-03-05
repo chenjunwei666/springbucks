@@ -35,16 +35,7 @@ public class SpringbucksApplication implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        /*initOrders();*/
-
-        int i=1,j=2;
-        do {
-            if (++i==j){
-                System.out.println("hello");
-            }
-        }while (i<5);
-
-        System.out.println("i="+i+"j="+j);
+        initOrders();
     }
 
 
