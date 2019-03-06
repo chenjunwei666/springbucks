@@ -16,10 +16,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 @EnableJpaRepositories
@@ -36,6 +39,7 @@ public class SpringbucksApplication implements ApplicationRunner {
     }
 
     @Override
+    @Transactional
     public void run(ApplicationArguments args) throws Exception {
         initOrders();
         findOrders();
@@ -79,8 +83,25 @@ public class SpringbucksApplication implements ApplicationRunner {
                 .forEach(coffee -> log.info("Loading {}",coffee));
 
 
+        List<CoffeeOrder> list = orderRepository.findTop3ByOrderByUpdateTimeDescIdAsc();
+        log.info("findTop3ByOrderByUpdateTimeDescIdAsc: {}",getJoinedOrderId(list));
 
-        //orderRepository.
+        list = orderRepository.findByCustomerOrderById("kobe");
+        log.info("findByCustomerOrderById: {}",getJoinedOrderId(list));
 
+        //不开启事务会因为没Session而报LazyInitializationException
+        list.forEach(order ->{
+            log.info("order {}",order.getId());
+            order.getItems().forEach(item -> log.info("item {}",item));
+        });
+
+        list = orderRepository.findByItems_Name("expresso");
+        log.info("findByItems_Name {}",getJoinedOrderId(list));
+
+    }
+
+    private String getJoinedOrderId(List<CoffeeOrder> list){
+        return list.stream().map(order -> order.getId().toString())
+                .collect(Collectors.joining(","));
     }
 }
